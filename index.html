@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Integrated Planner</title>
+    <style>
+        :root {
+            --primary-color: #2D3142;
+            --secondary-color: #9DA7DB;
+            --accent-color: #4F5D75;
+            --light-color: #E8E9F3;
+            --dark-color: #333333;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        nav {
+            background-color: var(--accent-color);
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background-color: var(--secondary-color);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        h1, h2, h3 {
+            color: var(--accent-color);
+        }
+        
+        .section-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .card {
+            background-color: var(--light-color);
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .task-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .task-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .task-list li.high-priority {
+            border-left-color: #F44336;
+        }
+        
+        .task-list li.medium-priority {
+            border-left-color: #FF9800;
+        }
+        
+        .task-list li.low-priority {
+            border-left-color: #4CAF50;
+        }
+        
+        .task-list input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.5);
+        }
+        
+        .task-list .task-details {
+            flex-grow: 1;
+        }
+        
+        .task-list .task-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .task-list .task-actions button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--accent-color);
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .calendar-day .date {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .calendar-day .events {
+            font-size: 12px;
+            overflow: hidden;
+        }
+        
+        .calendar-day .event {
+            margin-bottom: 2px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .calendar-day .event.meeting {
+            background-color: #BBDEFB;
+        }
+        
+        .calendar-day .event.deep-work {
+            background-color: #C8E6C9;
+        }
+        
+        .calendar-day .event.learning {
+            background-color: #FFECB3;
+        }
+        
+        .calendar-day .event.personal {
+            background-color: #F8BBD0;
+        }
+        
+        .chart {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .chart-bar {
+            width: 40px;
+            background-color: var(--secondary-color);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+        }
+        
+        .chart-bar::after {
+            content: attr(data-value);
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        textarea, input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: var(--accent-color);
+        }
+        
+        .ai-suggestion {
+            background-color: #E3F2FD;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .ai-suggestion h4 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+        
+        footer {
+            background-color: var(--accent-color);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+            }
+            
+            nav a {
+                margin: 5px 0;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar, .calendar-header {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AI-Integrated Planner</h1>
+        <p>A powerful planner enhanced with AI capabilities to optimize your productivity</p>
+    </header>
+    
+    <nav>
+        <a href="#" class="active">Dashboard</a>
+        <a href="#ai-task-assistant">AI Task Assistant</a>
+        <a href="#smart-calendar">Smart Calendar</a>
+        <a href="#productivity-insights">Productivity Insights</a>
+        <a href="#content-generator">Content Generator</a>
+    </nav>
+    
+    <main>
+        <section class="section">
+            <h2>Welcome to Your AI-Integrated Planner</h2>
+            <p>This interactive planner uses artificial intelligence to help you optimize your workflow, manage tasks efficiently, and boost your productivity.</p>
+            <p>Use the navigation menu to explore different sections and leverage AI to work smarter, not harder.</p>
+            
+            <div class="ai-suggestion">
+                <h4>AI Summary</h4>
+                <p>Based on your recent activity, here are your current priorities:</p>
+                <ul>
+                    <li><strong>High Priority:</strong> Complete project proposal (due in 2 days)</li>
+                    <li><strong>Medium Priority:</strong> Prepare for team meeting on Thursday</li>
+                    <li><strong>Productivity Insight:</strong> Your focus peaks between 9-11 AM. Consider scheduling deep work during this time.</li>
+                </ul>
+            </div>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Quick Actions</h3>
+                    <button type="button">Add New Task</button>
+                    <button type="button">Schedule Meeting</button>
+                    <button type="button">Generate Content</button>
+                    <button type="button">Analyze Productivity</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Today's Schedule</h3>
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #BBDEFB; border-radius: 5px;">
+                        <strong>9:00 AM - 10:00 AM</strong>
+                        <p style="margin: 5px 0 0 0;">Team Standup Meeting</p>
+                    </div>
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #C8E6C9; border-radius: 5px;">
+                        <strong>10:30 AM - 12:30 PM</strong>
+                        <p style="margin: 5px 0 0 0;">Deep Work: Project Proposal</p>
+                    </div>
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #FFECB3; border-radius: 5px;">
+                        <strong>1:30 PM - 2:30 PM</strong>
+                        <p style="margin: 5px 0 0 0;">Learning: AI Tools Workshop</p>
+                    </div>
+                    <div style="padding: 8px; background-color: #F8BBD0; border-radius: 5px;">
+                        <strong>3:00 PM - 4:00 PM</strong>
+                        <p style="margin: 5px 0 0 0;">Client Meeting: Project Review</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>AI Productivity Tip</h3>
+                    <p><em>"Based on your work patterns, I notice you often context-switch between tasks. Try grouping similar tasks together to reduce mental fatigue and increase efficiency."</em></p>
+                    <button type="button">Get More Tips</button>
+                </div>
+            </div>
+        </section>
+        
+        <section id="ai-task-assistant" class="section">
+            <div class="section-header">
+                <h2>AI Task Assistant</h2>
+            </div>
+            <p>Break down complex projects into manageable steps with AI assistance.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Task Breakdown</h3>
+                    <p>Enter a complex task or project, and the AI will break it down into manageable steps.</p>
+                    <textarea placeholder="Describe your project or complex task here..."></textarea>
+                    <button type="button">Generate Breakdown</button>
+                    
+                    <div class="ai-suggestion" style="margin-top: 20px;">
+                        <h4>Sample AI Breakdown</h4>
+                        <p><strong>Project: Website Redesign</strong></p>
+                        <ol>
+                            <li>Audit current website (2 hours)</li>
+                            <li>Define goals and requirements (1 hour)</li>
+                            <li>Create wireframes (3 hours)</li>
+                            <li>Design mockups (4 hours)</li>
+                            <li>Develop front-end (8 hours)</li>
+                            <li>Implement back-end functionality (6 hours)</li>
+                            <li>Content migration (3 hours)</li>
+                            <li>Testing and QA (4 hours)</li>
+                            <li>Launch and post-launch monitoring (2 hours)</li>
+                        </ol>
+                        <p><strong>Suggested Timeline:</strong> 2 weeks with dependencies mapped</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Task List</h3>
+                    <ul class="task-list">
+                        <li class="high-priority">
+                            <input type="checkbox">
+                            <div class="task-details">
+                                <strong>Complete project proposal</strong>
+                                <div>Due: Apr 17, 2025 | Est: 3 hours</div>
+                            </div>
+                            <div class="task-actions">
+                                <button title="Edit">✏️</button>
+                                <button title="Delete">🗑️</button>
+                            </div>
+                        </li>
+                        <li class="medium-priority">
+                            <input type="checkbox">
+                            <div class="task-details">
+                                <strong>Prepare for team meeting</strong>
+                                <div>Due: Apr 18, 2025 | Est: 1 hour</div>
+                            </div>
+                            <div class="task-actions">
+                                <button title="Edit">✏️</button>
+                                <button title="Delete">🗑️</button>
+                            </div>
+                        </li>
+                        <li class="medium-priority">
+                            <input type="checkbox">
+                            <div class="task-details">
+                                <strong>Review client feedback</strong>
+                                <div>Due: Apr 19, 2025 | Est: 45 min</div>
+                            </div>
+                            <div class="task-actions">
+                                <button title="Edit">✏️</button>
+                                <button title="Delete">🗑️</button>
+                            </div>
+                        </li>
+                        <li class="low-priority">
+                            <input type="checkbox">
+                            <div class="task-details">
+                                <strong>Update documentation</strong>
+                                <div>Due: Apr 22, 2025 | Est: 2 hours</div>
+                            </div>
+                            <div class="task-actions">
+                                <button title="Edit">✏️</button>
+                                <button title="Delete">🗑️</button>
+                            </div>
+                        </li>
+                    </ul>
+                    <button type="button">Add New Task</button>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 20px;">
+                <h3>Task Optimization</h3>
+                <p>AI analyzes your tasks and suggests the optimal order based on priority, deadlines, and dependencies.</p>
+                <button type="button">Optimize My Tasks</button>
+                
+                <div class="ai-suggestion" style="margin-top: 20px;">
+                    <h4>Optimized Task Sequence</h4>
+                    <p>Based on your deadlines, priorities, and energy patterns, here's the suggested order:</p>
+                    <ol>
+                        <li><strong>Complete project proposal</strong> (High priority, approaching deadline)</li>
+                        <li><strong>Review client feedback</strong> (Medium priority, needed for proposal)</li>
+                        <li><strong>Prepare for team meeting</strong> (Medium priority, can be done in shorter time blocks)</li>
+                        <li><strong>Update documentation</strong> (Low priority, flexible deadline)</li>
+                    </ol>
+                    <p><strong>Suggestion:</strong> Schedule "Complete project proposal" during your peak focus hours (9-11 AM).</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="smart-calendar" class="section">
+            <div class="section-header">
+                <h2>Smart Calendar</h2>
+            </div>
+            <p>AI-optimized calendar that helps you make the most of your time.</p>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0;">April 2025</h3>
+                <div>
+                    <button type="button" style="margin: 0 5px;">Previous</button>
+                    <button type="button" style="margin: 0 5px;">Next</button>
+                </div>
+            </div>
+            
+            <div class="calendar-header">
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+            </div>
+            
+            <div class="calendar">
+                <!-- Week 1 -->
+                <div class="calendar-day" style="opacity: 0.5;">
+                    <div class="date">30</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day" style="opacity: 0.5;">
+                    <div class="date">31</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">1</div>
+                    <div class="events">
+                        <div class="event meeting">Team Meeting</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">2</div>
+                    <div class="events">
+                        <div class="event deep-work">Project Work</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">3</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">4</div>
+                    <div class="events">
+                        <div class="event personal">Lunch w/ Client</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">5</div>
+                    <div class="events"></div>
+                </div>
+                
+                <!-- Week 2 -->
+                <div class="calendar-day">
+                    <div class="date">6</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">7</div>
+                    <div class="events">
+                        <div class="event meeting">Strategy Meeting</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">8</div>
+                    <div class="events">
+                        <div class="event learning">Workshop</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">9</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">10</div>
+                    <div class="events">
+                        <div class="event deep-work">Deadline</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">11</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">12</div>
+                    <div class="events"></div>
+                </div>
+                
+                <!-- Week 3 -->
+                <div class="calendar-day">
+                    <div class="date">13</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">14</div>
+                    <div class="events">
+                        <div class="event meeting">Team Standup</div>
+                    </div>
+                </div>
+                <div class="calendar-day" style="border: 2px solid var(--accent-color);">
+                    <div class="date">15</div>
+                    <div class="events">
+                        <div class="event meeting">Standup</div>
+                        <div class="event deep-work">Project</div>
+                        <div class="event learning">Workshop</div>
+                        <div class="event personal">Client</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">16</div>
+                    <div class="events">
+                        <div class="event deep-work">Focus Time</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">17</div>
+                    <div class="events">
+                        <div class="event deep-work">Proposal Due</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">18</div>
+                    <div class="events">
+                        <div class="event meeting">Team Meeting</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">19</div>
+                    <div class="events"></div>
+                </div>
+                
+                <!-- Week 4 -->
+                <div class="calendar-day">
+                    <div class="date">20</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">21</div>
+                    <div class="events">
+                        <div class="event meeting">Planning</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">22</div>
+                    <div class="events">
+                        <div class="event deep-work">Documentation</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">23</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">24</div>
+                    <div class="events">
+                        <div class="event personal">Conference</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">25</div>
+                    <div class="events">
+                        <div class="event personal">Conference</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">26</div>
+                    <div class="events"></div>
+                </div>
+                
+                <!-- Week 5 -->
+                <div class="calendar-day">
+                    <div class="date">27</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">28</div>
+                    <div class="events">
+                        <div class="event meeting">Review</div>
+                    </div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">29</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day">
+                    <div class="date">30</div>
+                    <div class="events">
+                        <div class="event deep-work">Planning</div>
+                    </div>
+                </div>
+                <div class="calendar-day" style="opacity: 0.5;">
+                    <div class="date">1</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day" style="opacity: 0.5;">
+                    <div class="date">2</div>
+                    <div class="events"></div>
+                </div>
+                <div class="calendar-day" style="opacity: 0.5;">
+                    <div class="date">3</div>
+                    <div class="events"></div>
+                </div>
+            </div>
+            
+            <div class="grid" style="margin-top: 30px;">
+                <div class="card">
+                    <h3>Time Blocking</h3>
+                    <p>AI suggests optimal time blocks for different types of work based on your energy patterns.</p>
+                    <form>
+                        <div style="margin-bottom: 15px;">
+                            <label for="work-type">Work Type:</label>
+                            <select id="work-type">
+                                <option value="deep-work">Deep Work</option>
+                                <option value="meetings">Meetings</option>
+                                <option value="learning">Learning</option>
+                                <option value="admin">Administrative</option>
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label for="duration">Duration (hours):</label>
+                            <input type="number" id="duration" min="0.5" max="8" step="0.5" value="2">
+                        </div>
+                        
+                        <button type="button">Find Optimal Time</button>
+                    </form>
+                    
+                    <div class="ai-suggestion" style="margin-top: 20px;">
+                        <h4>Suggested Time Blocks</h4>
+                        <p>Based on your productivity patterns and calendar:</p>
+                        <ol>
+                            <li><strong>Tomorrow, 9:00 AM - 11:00 AM</strong> (Peak focus time)</li>
+                            <li><strong>Thursday, 2:00 PM - 4:00 PM</strong> (Open slot, moderate energy)</li>
+                            <li><strong>Friday, 10:00 AM - 12:00 PM</strong> (Good focus time)</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Schedule Balancer</h3>
+                    <p>AI analyzes your calendar and suggests adjustments for better work-life balance.</p>
+                    <button type="button">Analyze My Schedule</button>
+                    
+                    <div class="ai-suggestion" style="margin-top: 20px;">
+                        <h4>Balance Analysis</h4>
+                        <p><strong>Current Week:</strong></p>
+                        <ul>
+                            <li>Deep Work: 12 hours (40%)</li>
+                            <li>Meetings: 10 hours (33%)</li>
+                            <li>Learning: 4 hours (13%)</li>
+                            <li>Personal/Breaks: 4 hours (13%)</li>
+                        </ul>
+                        <p><strong>Suggestions:</strong></p>
+                        <ul>
+                            <li>Add 2 more hours of personal/break time</li>
+                            <li>Consider consolidating meetings on Tuesday and Thursday</li>
+                            <li>Add a buffer between meetings to prevent burnout</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="productivity-insights" class="section">
+            <div class="section-header">
+                <h2>Productivity Insights</h2>
+            </div>
+            <p>AI-powered analytics to help you understand and improve your productivity patterns.</p>
+            
+            <div class="card">
+                <h3>Productivity Score Trend</h3>
+                <p>Your productivity score over the past 7 days:</p>
+                
+                <div class="chart">
+                    <div class="chart-bar" style="height: 60%;" data-value="60">
+                        <div class="chart-label">Mon</div>
+                    </div>
+                    <div class="chart-bar" style="height: 75%;" data-value="75">
+                        <div class="chart-label">Tue</div>
+                    </div>
+                    <div class="chart-bar" style="height: 85%;" data-value="85">
+                        <div class="chart-label">Wed</div>
+                    </div>
+                    <div class="chart-bar" style="height: 70%;" data-value="70">
+                        <div class="chart-label">Thu</div>
+                    </div>
+                    <div class="chart-bar" style="height: 65%;" data-value="65">
+                        <div class="chart-label">Fri</div>
+                    </div>
+                    <div class="chart-bar" style="height: 40%;" data-value="40">
+                        <div class="chart-label">Sat</div>
+                    </div>
+                    <div class="chart-bar" style="height: 45%;" data-value="45">
+                        <div class="chart-label">Sun</div>
+                    </div>
+                </div>
+                
+                <div class="ai-suggestion" style="margin-top: 20px;">
+                    <h4>Productivity Analysis</h4>
+                    <p>Your productivity peaks mid-week and dips on weekends. Wednesday was your most productive day with an 85% score.</p>
+                    <p><strong>Key Factors:</strong></p>
+                    <ul>
+                        <li>You completed 8 tasks on Wednesday vs. an average of 5 on other days</li>
+                        <li>You had 3 hours of uninterrupted deep work time</li>
+                        <li>You took regular breaks (5-10 minutes every hour)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="grid" style="margin-top: 20px;">
+                <div class="card">
+                    <h3>Focus Distribution</h3>
+                    <div style="display: flex; margin-top: 20px;">
+                        <div style="flex: 1; text-align: center;">
+                            <div style="width: 200px; height: 200px; border-radius: 50%; margin: 0 auto; background: conic-gradient(
+                                #4CAF50 0% 40%,
+                                #2196F3 40% 65%,
+                                #FFC107 65% 85%,
+                                #9E9E9E 85% 100%
+                            );"></div>
+                            <div style="margin-top: 20px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <div style="width: 15px; height: 15px; background-color: #4CAF50; margin-right: 10px;"></div>
+                                    <span>Deep Work (40%)</span>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <div style="width: 15px; height: 15px; background-color: #2196F3; margin-right: 10px;"></div>
+                                    <span>Meetings (25%)</span>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <div style="width: 15px; height: 15px; background-color: #FFC107; margin-right: 10px;"></div>
+                                    <span>Learning (20%)</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="width: 15px; height: 15px; background-color: #9E9E9E; margin-right: 10px;"></div>
+                                    <span>Other (15%)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Energy Patterns</h3>
+                    <p>Your average energy level throughout the day:</p>
+                    
+                    <div class="chart">
+                        <div class="chart-bar" style="height: 60%;" data-value="60">
+                            <div class="chart-label">6-8 AM</div>
+                        </div>
+                        <div class="chart-bar" style="height: 90%;" data-value="90">
+                            <div class="chart-label">9-11 AM</div>
+                        </div>
+                        <div class="chart-bar" style="height: 70%;" data-value="70">
+                            <div class="chart-label">12-2 PM</div>
+                        </div>
+                        <div class="chart-bar" style="height: 50%;" data-value="50">
+                            <div class="chart-label">3-5 PM</div>
+                        </div>
+                        <div class="chart-bar" style="height: 75%;" data-value="75">
+                            <div class="chart-label">6-8 PM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-suggestion">
+                        <h4>Energy Optimization</h4>
+                        <p>Based on your energy patterns:</p>
+                        <ul>
+                            <li>Schedule deep work and complex tasks between 9-11 AM</li>
+                            <li>Use the 3-5 PM dip for administrative tasks or breaks</li>
+                            <li>Consider a second productive period from 6-8 PM for creative work</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 20px;">
+                <h3>Improvement Suggestions</h3>
+                <p>AI suggests specific actions to improve your productivity based on your data.</p>
+                
+                <div class="ai-suggestion">
+                    <h4>Personalized Recommendations</h4>
+                    <ol>
+                        <li><strong>Implement Time Blocking:</strong> Schedule 90-minute deep work sessions in the morning when your energy is highest.</li>
+                        <li><strong>Reduce Meeting Time:</strong> Your data shows meetings consume 25% of your time. Consider batch processing meetings on Tuesdays and Thursdays.</li>
+                        <li><strong>Add Buffer Time:</strong> You often switch contexts without breaks. Add 15-minute buffers between different types of work.</li>
+                        <li><strong>Optimize Task Order:</strong> Complete high-priority, complex tasks during your morning energy peak (9-11 AM).</li>
+                        <li><strong>Implement a Shutdown Ritual:</strong> Data shows you often work late without proper closure. Create an end-of-day routine to improve recovery.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+        
+        <section id="content-generator" class="section">
+            <div class="section-header">
+                <h2>AI Content Generator</h2>
+            </div>
+            <p>Generate various types of content with AI assistance.</p>
+            
+            <div class="card">
+                <h3>Generate Content</h3>
+                <form>
+                    <div style="margin-bottom: 15px;">
+                        <label for="content-type">Content Type:</label>
+                        <select id="content-type">
+                            <option value="email">Email</option>
+                            <option value="social-post">Social Post</option>
+                            <option value="meeting-agenda">Meeting Agenda</option>
+                            <option value="project-brief">Project Brief</option>
+                            <option value="blog-outline">Blog Outline</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="topic">Topic/Subject:</label>
+                        <input type="text" id="topic" placeholder="Enter the main topic or subject...">
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="key-points">Key Points:</label>
+                        <textarea id="key-points" placeholder="Enter key points to include (one per line)..."></textarea>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="tone">Tone:</label>
+                        <select id="tone">
+                            <option value="professional">Professional</option>
+                            <option value="casual">Casual</option>
+                            <option value="enthusiastic">Enthusiastic</option>
+                            <option value="serious">Serious</option>
+                            <option value="friendly">Friendly</option>
+                            <option value="technical">Technical</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="length">Length:</label>
+                        <select id="length">
+                            <option value="very-short">Very Short</option>
+                            <option value="short">Short</option>
+                            <option value="medium">Medium</option>
+                            <option value="long">Long</option>
+                            <option value="very-long">Very Long</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button">Generate Content</button>
+                </form>
+            </div>
+            
+            <div class="card" style="margin-top: 20px;">
+                <h3>Generated Content</h3>
+                <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 10px;">
+                    <h4>Professional Email: Project Update</h4>
+                    
+                    <div style="border-left: 3px solid var(--secondary-color); padding-left: 15px; margin: 15px 0;">
+                        <p><strong>Subject:</strong> Weekly Project Update: Website Redesign Progress</p>
+                        <p><strong>Dear Team,</strong></p>
+                        <p>I'm writing to provide an update on our website redesign project as of April 15, 2025.</p>
+                        <p>We have successfully completed the following milestones:</p>
+                        <ul>
+                            <li>Finalized wireframes for all primary pages</li>
+                            <li>Completed user testing on the navigation structure</li>
+                            <li>Received client approval on the visual design direction</li>
+                        </ul>
+                        <p>Our current focus is on front-end development, which is approximately 60% complete. We're on track to meet our April 30 launch date, though we're monitoring two potential risks:</p>
+                        <ol>
+                            <li>Content migration is taking longer than anticipated</li>
+                            <li>Third-party API integration requires additional testing</li>
+                        </ol>
+                        <p>I've scheduled a brief check-in meeting this Thursday at 10:00 AM to discuss these items and ensure we remain on schedule.</p>
+                        <p>Please review the attached progress report before our meeting and come prepared with any questions or concerns.</p>
+                        <p><strong>Best regards,</strong><br>
+                        [Your Name]</p>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                        <button type="button">Copy to Clipboard</button>
+                        <button type="button">Regenerate</button>
+                        <button type="button">Refine Content</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid" style="margin-top: 20px;">
+                <div class="card">
+                    <h3>Content Templates</h3>
+                    <p>Pre-built templates for common content needs:</p>
+                    <ul style="list-style-type: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><button type="button" style="width: 100%;">Professional Email</button></li>
+                        <li style="margin-bottom: 10px;"><button type="button" style="width: 100%;">Meeting Agenda</button></li>
+                        <li style="margin-bottom: 10px;"><button type="button" style="width: 100%;">Social Media Post</button></li>
+                        <li style="margin-bottom: 10px;"><button type="button" style="width: 100%;">Project Brief</button></li>
+                        <li><button type="button" style="width: 100%;">Weekly Report</button></li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Content History</h3>
+                    <p>Recently generated content:</p>
+                    <ul style="list-style-type: none; padding: 0;">
+                        <li style="padding: 10px; background-color: #f0f0f0; margin-bottom: 10px; border-radius: 5px;">
+                            <strong>Project Brief: Mobile App Development</strong>
+                            <div>Created: Apr 12, 2025</div>
+                            <button type="button" style="margin-top: 5px;">View</button>
+                        </li>
+                        <li style="padding: 10px; background-color: #f0f0f0; margin-bottom: 10px; border-radius: 5px;">
+                            <strong>Meeting Agenda: Quarterly Review</strong>
+                            <div>Created: Apr 10, 2025</div>
+                            <button type="button" style="margin-top: 5px;">View</button>
+                        </li>
+                        <li style="padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
+                            <strong>Email: Client Follow-up</strong>
+                            <div>Created: Apr 8, 2025</div>
+                            <button type="button" style="margin-top: 5px;">View</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>AI-Integrated Planner &copy; 2025</p>
+        <p>Embrace the future of productivity with AI assistance.</p>
+    </footer>
+    
+    <script>
+        // Simple JavaScript to handle basic interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all calendar day elements
+            const calendarDays = document.querySelectorAll('.calendar-day');
+            
+            // Add click event to each day
+            calendarDays.forEach(day => {
+                day.addEventListener('click', function() {
+                    // Remove selected class from all days
+                    calendarDays.forEach(d => d.classList.remove('selected'));
+                    
+                    // Add selected class to clicked day
+                    this.classList.add('selected');
+                    
+                    // Here you would typically show events for the selected day
+                    // or open a modal to add/edit events
+                    alert(`Selected: April ${this.querySelector('.date').textContent}, 2025`);
+                });
+            });
+            
+            // Task checkbox functionality
+            const taskCheckboxes = document.querySelectorAll('.task-list input[type="checkbox"]');
+            taskCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const taskItem = this.closest('li');
+                    if (this.checked) {
+                        taskItem.style.opacity = '0.6';
+                        taskItem.style.textDecoration = 'line-through';
+                    } else {
+                        taskItem.style.opacity = '1';
+                        taskItem.style.textDecoration = 'none';
+                    }
+                });
+            });
+            
+            // Content generation button
+            const generateButton = document.querySelector('#content-generator button');
+            if (generateButton) {
+                generateButton.addEventListener('click', function() {
+                    // In a real application, this would call an AI service
+                    alert('Content generation request sent to AI. Results will appear shortly.');
+                });
+            }
+            
+            // Task optimization button
+            const optimizeButton = document.querySelector('#ai-task-assistant button');
+            if (optimizeButton) {
+                optimizeButton.addEventListener('click', function() {
+                    // In a real application, this would call an AI service
+                    alert('Task optimization request sent to AI. Optimized sequence will appear shortly.');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
